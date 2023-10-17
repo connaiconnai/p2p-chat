@@ -15,3 +15,7 @@ init:
 
 python:
 	docker compose exec python3 bash
+
+app:
+	docker compose exec python3 sh -c  "python3 app.py"
+
