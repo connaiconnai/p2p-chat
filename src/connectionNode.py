@@ -4,7 +4,7 @@ import time
 
 # time to disconnect from node if not pinged, nodes ping after 20s
 DEAD_TIME = ( 45 )
-SET_TIMEOUT = 1.0
+SET_TIMEOUT = 60.0
 BUFFER = 4096 # byte
 
 class ConnectionNode(threading.Thread):
@@ -13,28 +13,26 @@ class ConnectionNode(threading.Thread):
 
         self.main_node = main_node
         self.id = id
-        self.sock = sock
         self.host = host
         self.port = port
-
+        self.sock = sock
         self.sock.settimeout(SET_TIMEOUT)
         self.terminate_flag = threading.Event()
         self.last_ping = time.time()
         # Variable for parsing the incoming json messages
         self.buffer = ""
 
+    # FIX: once sent
     def send(self, data):
         try:
-            self.sock.sendall(data.encode("utf-8"))
+            self.sock.send(data)
 
-        except:
+        except Exception as e:
             self.terminate_flag.set()
 
     def connection_dead(self):
-        # self.main_node.node_disconnected(self)
         self.sock.settimeout(None)
         self.sock.close()
-        # del self.main_node.node_connection[self.main_node.nodes_connected.index(self)]
         time.sleep(1)
 
     def stop(self):
