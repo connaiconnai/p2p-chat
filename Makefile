@@ -12,6 +12,9 @@ init:
 	@make buildup
 	@make python
 
+down:
+	docker compose down
+
 
 python:
 	docker compose exec python3 bash

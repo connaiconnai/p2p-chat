@@ -72,6 +72,7 @@ class Node(threading.Thread):
         except BrokenPipeError as e:
             print(e)
 
+    # WARNING: need new socket instance.
     def create_new_connection(self, sock, id, host, port):
         re_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         re_sock.connect((host, port))
@@ -95,8 +96,7 @@ class Node(threading.Thread):
         for i in self.peers:
             i.send(message)
 
-    # TODO: send a message
-    # WARNING: need new socket instance.
+    # FIX: once send
     def message(self, data):
         try:
             self.send_to_peers(data.encode("utf-8"))
