@@ -25,7 +25,6 @@ class ConnectionNode(threading.Thread):
 
     def send(self, data):
         try:
-            data = data + "-TSN"
             self.sock.sendall(data.encode("utf-8"))
 
         except:
@@ -75,7 +74,7 @@ class ConnectionNode(threading.Thread):
 
                     index = self.buffer.find("-TSN")
 
-            time.sleep(0.01)
+            time.sleep(0.1)
 
         # if running is stop
         self.connection_dead()

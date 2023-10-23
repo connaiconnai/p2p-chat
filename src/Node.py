@@ -5,7 +5,7 @@ from connectionNode import ConnectionNode
 
 MAX_NODE = 10
 BUFFER = 4096 # byte
-SET_TIMEOUT = 1.0
+SET_TIMEOUT = 60.0
 PORT = 2
 
 # TODO: port forward
@@ -60,32 +60,32 @@ class Node(threading.Thread):
 
         sock.send(self.id.encode("utf-8"))
         connected_node_id = sock.recv(BUFFER).decode("utf-8")
-        self.node = sock
 
-        # NOTE: Are there times when connected_node_id is not the same as self.id?
-        # if self.id == connected_node_id:
-        #     if ipaddress.ip_address(host).is_private:
-        #         self.local_ip = host
-        #     else:
-        #         self.ip = host
-        #     self.banned.append(host)
-        #     sock.close()
-        #     return False
 
-        node = self.create_new_connection(
-            sock, connected_node_id, host, port
-        )
-        self.append_peer(node)
+        self.sock = sock
+
+        # self.node = self.create_new_connection(
+        #     sock, connected_node_id, host, port
+        # )
+        # self.append_peer(self.node)
 
     def create_new_connection(self, sock, id, host, port):
         node = ConnectionNode(self, sock, id, host, port)
         node.start()
         return node
 
+    def node_connected(self, node):
+        if node.host not in self.peers:
+            self.peers.append(node.host)
+        # self.send_peers()
+
     def append_peer(self, node):
         if node.host not in self.peers:
             self.peers.append(node)
         # self.send_peers()
+
+    # def send_peers(self):
+    #     self.message("peers", self.peers)
 
     def send_to_peers(self, message):
         for i in self.peers:
@@ -93,7 +93,8 @@ class Node(threading.Thread):
 
     # TODO: send a message
     def message(self, data):
-        self.node.send(data.encode("utf-8"))
+        self.sock.send('test'.encode('utf-8'))
+        # self.node.send(data.encode("utf-8"))
         # self.send_to_peers(data.encode("utf-8"))
 
 

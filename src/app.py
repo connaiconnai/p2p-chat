@@ -3,7 +3,7 @@ from Node import Node
 
 def generateNode(base=2):
     try:
-        return Node('', base)
+        return Node('0.0.0.0', base)
     except :
         return generateNode(base+1)
 
@@ -11,23 +11,20 @@ def generateNode(base=2):
 node = generateNode()
 node.start()
 
-if(node.port > 2):
-    try:
-        host = "192.168.107.2"
+try:
+    if(node.port > 2):
+        # host and port for test
+        host = node.host
         port = "2"
         node.connect_to(host, int(port))
-        while not node.terminate_flag.is_set():
-            cmd = input("command: ")
-            if(cmd == "connect"):
-                pass
+    while not node.terminate_flag.is_set():
+        msg = input("msg: ")
+        node.message(msg)
 
-            if(cmd == "msg"):
-                msg = input("msg: ")
-                node.message(msg)
+        if(msg == "q"):
+            node.stop()
+            break
 
-            if(cmd == "q"):
-                node.stop()
-                break
-    except Exception as e:
-        print(e)
-        node.stop()
+except Exception as e:
+    print(e)
+    node.stop()
