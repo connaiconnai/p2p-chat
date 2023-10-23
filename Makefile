@@ -12,5 +12,11 @@ init:
 	@make buildup
 	@make python
 
-python:
-	docker compose exec python3 bash
+app:
+	docker compose exec python3 sh -c "python3 app.py"
+
+server:
+	docker compose exec python3 sh -c "python3 server.py"
+
+client:
+	docker compose exec python3 sh -c "python3 client.py"
