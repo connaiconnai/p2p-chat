@@ -41,4 +41,4 @@ class Client(threading.Thread):
 
 if __name__=="__main__":
     cli = Client()
-    cli.run()
+    cli.start()
