@@ -51,23 +51,29 @@ class Node(threading.Thread):
                 if data:
                     print(data)
 
-            except:
+            except Exception as e:
+                print(e)
                 pass
 
     def connect_to(self, host, port=PORT):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((host, port))
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.connect((host, port))
 
-        sock.send(self.id.encode("utf-8"))
-        connected_node_id = sock.recv(BUFFER).decode("utf-8")
+            sock.send(self.id.encode("utf-8"))
+            connected_node_id = sock.recv(BUFFER).decode("utf-8")
 
-
-        self.sock = sock
-
-        # self.node = self.create_new_connection(
-        #     sock, connected_node_id, host, port
-        # )
-        # self.append_peer(self.node)
+            self.sock = sock
+            
+            sock.send(self.host.encode('utf-8'))
+            # self.node = self.create_new_connection(
+            #     sock, connected_node_id, host, port
+            # )
+            # self.append_peer(self.node)
+        except ConnectionResetError as e:
+            print(e)
+        except BrokenPipeError as e:
+            print(e)
 
     def create_new_connection(self, sock, id, host, port):
         node = ConnectionNode(self, sock, id, host, port)
@@ -93,9 +99,12 @@ class Node(threading.Thread):
 
     # TODO: send a message
     def message(self, data):
-        self.sock.send('test'.encode('utf-8'))
-        # self.node.send(data.encode("utf-8"))
-        # self.send_to_peers(data.encode("utf-8"))
+        try:
+            self.sock.send(data.encode('utf-8'))
+            # self.node.send(data.encode("utf-8"))
+            # self.send_to_peers(data.encode("utf-8"))
+        except Exception as e:
+            print(e)
 
 
 

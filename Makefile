@@ -19,3 +19,6 @@ python:
 app:
 	docker compose exec python3 sh -c  "python3 app.py"
 
+test:
+	docker compose exec python3 sh -c  "python3 test.py"
+
