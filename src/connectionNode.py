@@ -7,11 +7,10 @@ DEAD_TIME = ( 45 )
 SET_TIMEOUT = 60.0
 BUFFER = 4096 # byte
 
-class ConnectionNode(threading.Thread):
-    def __init__(self, main_node, sock, id, host, port):
-        super(ConnectionNode, self).__init__()
+class Client(threading.Thread):
+    def __init__(self,  sock, id, host, port):
+        super(Client, self).__init__()
 
-        self.main_node = main_node
         self.id = id
         self.host = host
         self.port = port
@@ -26,8 +25,7 @@ class ConnectionNode(threading.Thread):
     def send(self, data):
         try:
             self.sock.send(data)
-
-        except Exception as e:
+        except :
             self.terminate_flag.set()
 
     def connection_dead(self):
@@ -67,8 +65,6 @@ class ConnectionNode(threading.Thread):
 
                     if message == "ping":
                         self.last_ping = time.time()
-                    else:
-                        self.main_node.node_message(self, message)
 
                     index = self.buffer.find("-TSN")
 

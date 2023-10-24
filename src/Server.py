@@ -1,7 +1,6 @@
 import threading
 import socket
 from lib import crypto_funcs as cf
-from connectionNode import ConnectionNode
 
 MAX_NODE = 10
 BUFFER = 4096 # byte
@@ -9,9 +8,9 @@ SET_TIMEOUT = 60.0
 PORT = 2
 
 # TODO: port forward
-class Node(threading.Thread):
+class Server(threading.Thread):
     def __init__(self, host = "0.0.0.0", port = PORT ):
-        super(Node, self).__init__()
+        super(Server, self).__init__()
 
         self.terminate_flag = threading.Event()
 
@@ -57,51 +56,17 @@ class Node(threading.Thread):
     def connect_to(self, host, port=PORT):
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.peer = (host, port)
             sock.connect((host, port))
-
             sock.send(self.id.encode("utf-8"))
             connected_node_id = sock.recv(BUFFER).decode("utf-8")
-            self.pear = (host, port)
 
-            self.node = self.create_new_connection(
-                sock, connected_node_id, host, port
-            )
-            self.append_peer(self.node)
         except ConnectionResetError as e:
             print(e)
         except BrokenPipeError as e:
             print(e)
 
-    # WARNING: need new socket instance.
-    def create_new_connection(self, sock, id, host, port):
-        re_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        re_sock.connect((host, port))
-        node = ConnectionNode(self, re_sock, id, host, port)
-        return node
-
-    def node_connected(self, node):
-        if node.host not in self.peers:
-            self.peers.append(node.host)
-        # self.send_peers()
-
-    def append_peer(self, node):
-        if node.host not in self.peers:
-            self.peers.append(node)
-        # self.send_peers()
-
-    # def send_peers(self):
-    #     self.message("peers", self.peers)
-
-    def send_to_peers(self, message):
-        for i in self.peers:
-            i.send(message)
-
-    # FIX: once send
-    def message(self, data):
-        try:
-            self.send_to_peers(data.encode("utf-8"))
-        except Exception as e:
-            print(e)
-
-
-
+    def send_message(self, data):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect(self.peer)
+        sock.send(data.encode('utf-8'))
