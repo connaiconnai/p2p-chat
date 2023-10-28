@@ -7,7 +7,6 @@ BUFFER = 4096 # byte
 SET_TIMEOUT = 60.0
 PORT = 2
 
-# TODO: port forward
 class Server(threading.Thread):
     def __init__(self, host = "0.0.0.0", port = PORT ):
         super(Server, self).__init__()
@@ -58,6 +57,7 @@ class Server(threading.Thread):
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.peer = (host, port)
             sock.connect((host, port))
+            self.peer_sock = sock
             sock.send(self.id.encode("utf-8"))
             connected_node_id = sock.recv(BUFFER).decode("utf-8")
 
@@ -67,6 +67,10 @@ class Server(threading.Thread):
             print(e)
 
     def send_message(self, data):
+        print('prev:\n')
+        print(self.peer_sock)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect(self.peer)
+        print('\n]new:\n')
+        print(sock)
         sock.send(data.encode('utf-8'))
