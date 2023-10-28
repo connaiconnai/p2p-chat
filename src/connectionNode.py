@@ -3,29 +3,32 @@ import socket
 import time
 
 # time to disconnect from node if not pinged, nodes ping after 20s
-DEAD_TIME = ( 45 )
+DEAD_TIME = 45
 SET_TIMEOUT = 60.0
-BUFFER = 4096 # byte
+BUFFER = 4096  # byte
 
-class Client(threading.Thread):
-    def __init__(self,  sock, id, host, port):
-        super(Client, self).__init__()
 
+class ConnectionNode(threading.Thread):
+    def __init__(self, id, host, port, master_node):
+        super(ConnectionNode, self).__init__()
+        self.master_node = master_node
         self.id = id
         self.host = host
         self.port = port
-        self.sock = sock
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.connect((host, port))
         self.sock.settimeout(SET_TIMEOUT)
         self.terminate_flag = threading.Event()
         self.last_ping = time.time()
         # Variable for parsing the incoming json messages
         self.buffer = ""
 
-    # FIX: once sent
     def send(self, data):
         try:
+            # print(self.sock)
+            # print(self.master_node.port, self.master_node.host)
             self.sock.send(data)
-        except :
+        except:
             self.terminate_flag.set()
 
     def connection_dead(self):
@@ -42,34 +45,7 @@ class Client(threading.Thread):
                 self.terminate_flag.set()
                 print("node" + self.id + "is dead")
 
-            line = ""
-            try:
-                line = self.sock.recv(BUFFER)
-            except socket.timeout:
-                pass
-            except Exception as e:
-                self.terminate_flag.set()
-
-            if line != "":
-                try:
-                    self.buffer += str(line.decode("utf-8"))
-
-                except Exception as e:
-                    print("NodeConnection: Decoding line error | " + str(e))
-
-                # Get the messages by finding the message ending -TSN
-                index = self.buffer.find("-TSN")
-                while index > 0:
-                    message = self.buffer[0:index]
-                    self.buffer = self.buffer[index + 4 : :]
-
-                    if message == "ping":
-                        self.last_ping = time.time()
-
-                    index = self.buffer.find("-TSN")
-
             time.sleep(0.1)
 
         # if running is stop
         self.connection_dead()
-
