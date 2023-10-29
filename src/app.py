@@ -1,21 +1,12 @@
 from Server import Server
+from Client import Client
 
 
-def generateNode(base=2):
-    try:
-        return Server("0.0.0.0", base)
-    except:
-        return generateNode(base + 1)
-
-
-server = generateNode()
+port = int(input("binding port >"))
+server = Server(port)
 server.start()
 
-if server.port > 2:
-    # host and port for test
-    host = server.host
-    port = "2"
-    server.connect_to(host, int(port))
-    while True:
-        msg = input("> ")
-        server.send_message(msg)
+# host and port for test
+client = Client()
+client.connection()
+client.message()
