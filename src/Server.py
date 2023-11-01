@@ -1,5 +1,6 @@
 import threading
 import socket
+from lib import portforward
 
 
 BACK_LOG = 10
@@ -16,6 +17,8 @@ class Server(threading.Thread):
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.bind((self.host, self.port))
+
+        portforward.forwardPort(port, port, None, None, False, "TCP", 0, "", True)
 
     def close(self):
         self.sock.close()
